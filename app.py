@@ -2,7 +2,44 @@ import tkinter as tk
 from PIL import Image,ImageTk
 from tkinter.filedialog import askdirectory
 
+from BezierCurve import BezierCurve
+from utils import Point
+
 import os
+
+class DragPoint:
+    def __init__(self, canvas: tk.Canvas, p: Point):
+        self.canvas = canvas
+        self.p = p
+        self.x = p.x
+        self.y = p.y
+
+        self.dot = self.create_dot(p.x, p.y)
+        self.canvas.tag_bind(self.dot, "<Button-1>", self.drag_start)
+        self.canvas.tag_bind(self.dot, "<B1-Motion>", self.drag_motion)
+
+    def create_dot(self, x, y, r=5):
+        return self.canvas.create_oval(x-r/2, y-r/2, x+r/2, y+r/2, fill="black", width=10)
+    
+    def drag_start(self, event):
+        self.start_x = event.x
+        self.start_y = event.y
+
+    def drag_motion(self, event):
+        dx = event.x - self.start_x
+        dy = event.y - self.start_y
+
+        self.canvas.move(self.dot, dx, dy)
+
+        self.start_x = event.x
+        self.start_y = event.y
+
+    def get_position(self):
+        pos = self.canvas.coords(self.dot)
+        cx = (pos[0] + pos[2]) / 2
+        cy = (pos[1] + pos[3]) / 2
+        return Point(cx, cy)
+
 
 class App:
     def __init__(self, width, height, buffer=70):
@@ -20,6 +57,14 @@ class App:
         self.field = ImageTk.PhotoImage(Image.open("field.png"))
         self.canvas.create_image(width/2, height/2, anchor=tk.CENTER, image=self.field)
 
+        self.drag_points = []
+        self.bz_curves = []
+
+        self.add_bz_curve(
+            Point(200, 200),
+            Point(300, 300),
+            Point(400, 200)
+        )
         
     def create_lines(self):
         for i in range(6):
@@ -60,17 +105,31 @@ class App:
 
     def browsefunc(self):
         directory = askdirectory()
+        if directory == "":
+            return
+
         os.chdir(directory)
 
         with open("control_points.txt", "+w") as f:
             f.write("[(0, 0), (0, 0), (0, 0)]")
 
-    def start(self):
-        self.root.mainloop()
+    def add_bz_curve(self, p0, p1, p2):
+        bz = BezierCurve(p0, p1, p2)
+        self.bz_curves.append(bz)
+        p = [p0, p1, p2]
 
-app = App(640, 640)
-app.create_lines()
-app.pixel_inch_lines()
-app.draw_metric_text()
-app.draw_buttons()
-app.start()
+        for point in p:
+            self.drag_points.append(DragPoint(self.canvas, point))
+
+    def start(self):
+        while True:
+            self.root.update()
+            
+
+if __name__ == '__main__':
+    app = App(640, 640)
+    app.create_lines()
+    app.pixel_inch_lines()
+    app.draw_metric_text()
+    app.draw_buttons()
+    app.start()
