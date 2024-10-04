@@ -70,7 +70,7 @@ class App:
         for i in range(6):
             self.canvas.create_line((106+(2/3))*i, self.height+self.buffer/2, (106+(2/3))*(i+1), self.height+self.buffer/2, fill="blue", width=5)
             self.canvas.create_line((106+(2/3))*i, self.height, (106+(2/3))*i, self.height+self.buffer, fill="black", width=5)
-            self.canvas.create_text((((106+(2/3))*i) + ((106+(2/3))*(i+1)))/2, self.height+self.buffer/2+20, text="106.66px", font=('Helvetica 15 bold'))
+            self.canvas.create_text((((106+(2/3))*i) + ((106+(2/3))*(i+1)))/2, self.height+self.buffer/2+20, text="24in", font=('Helvetica 15 bold'))
 
         self.canvas.create_line(5, self.height, 5, self.height+self.buffer, fill="black", width=5)
         self.canvas.create_line(640, self.height, 640, self.height+self.buffer, fill="black", width=5)
