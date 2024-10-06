@@ -62,7 +62,7 @@ class App:
 
         self.add_bz_curve(
             Point(200, 200),
-            Point(300, 300),
+            Point(300, 100),
             Point(400, 200)
         )
         
